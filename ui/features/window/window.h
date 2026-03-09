@@ -1,6 +1,6 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
+#include "../editor/editor_widget.h"
 #include <QMainWindow>
 
 class MainWindow : public QMainWindow {
@@ -9,6 +9,7 @@ class MainWindow : public QMainWindow {
 public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
-};
 
-#endif // WINDOW_H
+private:
+  EditorWidget *m_editorWidget;
+};

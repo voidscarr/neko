@@ -12,6 +12,9 @@ qt_add_executable(neko
     main.cpp
     features/window/window.cpp
     features/window/window.h
+
+    features/editor/editor_widget.cpp
+    features/editor/editor_widget.h
 )
 
 qt_add_translations(
