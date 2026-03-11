@@ -1,7 +1,11 @@
 #include "editor_widget.h"
 #include <QPainter>
 
-EditorWidget::EditorWidget(QWidget *parent) { setAutoFillBackground(false); }
+EditorWidget::EditorWidget(QWidget *parent)
+    : m_font(QFont("IBM Plex Mono", 15.0)),
+      m_fontMetrics(QFontMetricsF(m_font)), QWidget(parent) {
+  setAutoFillBackground(false);
+}
 
 void EditorWidget::paintEvent(QPaintEvent *event) {
   QPainter painter(this);
@@ -9,12 +13,11 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   // Background
   painter.fillRect(rect(), "black");
 
-  // TODO: Add theming
-  // TODO: Move this to class/add font metrics inst.
   // Text
-  QFont font = QFont("IBM Plex Mono", 15.0);
+  // TODO: Add theming
   painter.setPen("white");
-  painter.setFont(font);
+  painter.setFont(m_font);
 
-  painter.drawText(rect().topLeft() + QPoint(0, font.pointSize()), "meow");
+  painter.drawText(rect().topLeft() + QPoint(0, m_fontMetrics.height()),
+                   "meow");
 }

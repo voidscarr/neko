@@ -11,4 +11,7 @@ public:
 
 private:
   void paintEvent(QPaintEvent *event) override;
+
+  QFont m_font;
+  QFontMetricsF m_fontMetrics;
 };
