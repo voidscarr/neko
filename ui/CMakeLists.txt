@@ -5,6 +5,13 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
 
+add_library(neko_core SHARED IMPORTED)
+set(NEKO_CORE_LIB "${CMAKE_SOURCE_DIR}/../core/target/debug/libneko_core.a")
+set_target_properties(neko_core PROPERTIES 
+  IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/../core/target/cxxbridge/neko_core/src/ffi.rs.cc"
+  INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/../core/target/cxxbridge/neko_core/src"
+)
+
 qt_standard_project_setup()
 
 qt_add_executable(neko
@@ -26,6 +33,8 @@ target_link_libraries(neko
     PRIVATE
         Qt::Core
         Qt::Widgets
+        neko_core
+        ${NEKO_CORE_LIB}
 )
 
 include(GNUInstallDirs)
