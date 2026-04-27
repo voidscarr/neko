@@ -1,4 +1,6 @@
 #include "editor_widget.h"
+#include <QApplication>
+#include <QClipboard>
 #include <QKeyEvent>
 #include <QPainter>
 #include <ffi.rs.h>
@@ -28,6 +30,40 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
 }
 
 void EditorWidget::keyPressEvent(QKeyEvent *event) {
+  auto ctrlActive =
+      event->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier);
+  // auto cmdActive =
+  //     event->modifiers().testFlag(Qt::KeyboardModifier::MetaModifier);
+  // auto altActive =
+  //     event->modifiers().testFlag(Qt::KeyboardModifier::AltModifier);
+
+  if (ctrlActive) {
+    switch (event->key()) {
+    case Qt::Key_A:
+      // TODO: Add select all
+      repaint();
+      return;
+    case Qt::Key_V: {
+      const std::string clipboardText =
+          QApplication::clipboard()->text().toStdString();
+
+      m_buffer->insert_char(clipboardText.c_str());
+
+      repaint();
+      return;
+    }
+    case Qt::Key_C:
+    case Qt::Key_X: {
+      // TODO: Add actual selections
+      const std::string text = "test";
+      QApplication::clipboard()->setText(text.c_str());
+
+      repaint();
+      return;
+    }
+    }
+  }
+
   switch (event->key()) {
   case Qt::Key_Enter:
   case Qt::Key_Return:
