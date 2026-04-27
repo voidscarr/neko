@@ -1,21 +1,22 @@
-use crate::Buffer;
+use crate::Editor;
 
-fn new_empty_buffer() -> Box<Buffer> {
-    Box::new(Buffer::new_empty())
+fn new_editor() -> Box<Editor> {
+    Box::new(Editor::new())
 }
 
 #[cxx::bridge]
 #[allow(clippy::module_inception)]
 mod ffi {
+
     extern "Rust" {
-        type Buffer;
+        type Editor;
 
-        fn new_empty_buffer() -> Box<Buffer>;
+        fn new_editor() -> Box<Editor>;
 
-        // Buffer
-        fn insert_char(self: &mut Buffer, text: &str);
-        fn remove_char(self: &mut Buffer, range_start: usize, range_end: usize);
-        fn content_slice(self: &Buffer, range_start: usize, range_end: usize) -> String;
-        fn len(self: &Buffer) -> usize;
+        // Editor
+        fn insert_char(self: &mut Editor, text: &str);
+        fn remove_char(self: &mut Editor, range_start: usize, range_end: usize);
+        fn content_slice(self: &Editor, range_start: usize, range_end: usize) -> String;
+        fn content_len(self: &Editor) -> usize;
     }
 }

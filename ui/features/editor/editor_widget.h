@@ -16,5 +16,5 @@ private:
 
   QFont m_font;
   QFontMetricsF m_fontMetrics;
-  rust::Box<Buffer> m_buffer;
+  rust::Box<Editor> m_editor;
 };

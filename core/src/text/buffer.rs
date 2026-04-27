@@ -4,8 +4,14 @@ pub struct Buffer {
     content: Rope,
 }
 
+impl Default for Buffer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Buffer {
-    pub fn new_empty() -> Self {
+    pub fn new() -> Self {
         Self {
             content: Rope::new(),
         }
@@ -29,5 +35,9 @@ impl Buffer {
 
     pub fn len(&self) -> usize {
         self.content.byte_len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.content.is_empty()
     }
 }
