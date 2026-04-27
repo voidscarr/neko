@@ -25,8 +25,12 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   painter.setPen("white");
   painter.setFont(m_font);
 
-  // TODO: Implement line wrapping in the future (option toggle)
-  painter.drawText(rect(), m_buffer->content_slice(0, m_buffer->len()).c_str());
+  // TODO: Implement line wrapping option toggle
+  QTextOption qTextOption;
+  qTextOption.setWrapMode(QTextOption::NoWrap);
+
+  painter.drawText(rect(), m_buffer->content_slice(0, m_buffer->len()).c_str(),
+                   qTextOption);
 }
 
 void EditorWidget::keyPressEvent(QKeyEvent *event) {
