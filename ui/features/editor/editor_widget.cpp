@@ -23,7 +23,7 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   painter.setPen("white");
   painter.setFont(m_font);
 
-  // TODO: Implement line wrapping in the future
+  // TODO: Implement line wrapping in the future (option toggle)
   painter.drawText(rect(), m_buffer->content_slice(0, m_buffer->len()).c_str());
 }
 
@@ -32,6 +32,10 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   case Qt::Key_Enter:
   case Qt::Key_Return:
     m_buffer->insert_char("\n");
+    break;
+  case Qt::Key_Tab:
+    // TODO: Make this configurable for \t or 2/4/8+ spaces
+    m_buffer->insert_char("    ");
     break;
   case Qt::Key_Backspace:
     m_buffer->remove_char(m_buffer->len() - 1, m_buffer->len());
