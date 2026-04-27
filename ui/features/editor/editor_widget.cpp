@@ -24,11 +24,22 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   painter.setFont(m_font);
 
   // TODO: Implement line wrapping in the future
-  painter.drawText(rect().topLeft() + QPoint(0, m_fontMetrics.height()),
-                   m_buffer->content_slice(0, m_buffer->len()).c_str());
+  painter.drawText(rect(), m_buffer->content_slice(0, m_buffer->len()).c_str());
 }
 
 void EditorWidget::keyPressEvent(QKeyEvent *event) {
-  m_buffer->insert_char(event->text().toStdString().c_str());
+  switch (event->key()) {
+  case Qt::Key_Enter:
+  case Qt::Key_Return:
+    m_buffer->insert_char("\n");
+    break;
+  case Qt::Key_Backspace:
+    m_buffer->remove_char(m_buffer->len() - 1, m_buffer->len());
+    break;
+  default:
+    m_buffer->insert_char(event->text().toStdString().c_str());
+    break;
+  }
+
   repaint();
 }
