@@ -12,8 +12,9 @@ public:
 
 private:
   void paintEvent(QPaintEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
   QFont m_font;
   QFontMetricsF m_fontMetrics;
-  Buffer *m_buffer;
+  rust::Box<Buffer> m_buffer;
 };
