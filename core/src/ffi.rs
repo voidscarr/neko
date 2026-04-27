@@ -15,7 +15,7 @@ impl Buffer {
         self.content.insert(self.len(), text);
     }
 
-    pub fn content(&self, range_start: usize, range_end: usize) -> String {
+    pub fn content_slice(&self, range_start: usize, range_end: usize) -> String {
         self.content.byte_slice(range_start..range_end).to_string()
     }
 
@@ -38,7 +38,7 @@ mod ffi {
 
         // Buffer
         fn insert_char(self: &mut Buffer, text: &str);
-        fn content(self: &Buffer, range_start: usize, range_end: usize) -> String;
+        fn content_slice(self: &Buffer, range_start: usize, range_end: usize) -> String;
         fn len(self: &Buffer) -> usize;
     }
 }
