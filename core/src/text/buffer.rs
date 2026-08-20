@@ -1,4 +1,4 @@
-use crop::Rope;
+use crop::{Rope, iter::RawLines};
 
 pub struct Buffer {
     content: Rope,
@@ -17,8 +17,8 @@ impl Buffer {
         }
     }
 
-    pub fn insert_char(&mut self, text: &str) {
-        self.content.insert(self.len(), text);
+    pub fn insert_char(&mut self, index: usize, text: &str) {
+        self.content.insert(index, text);
     }
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
@@ -31,6 +31,10 @@ impl Buffer {
 
     pub fn content_slice(&self, range_start: usize, range_end: usize) -> String {
         self.content.byte_slice(range_start..range_end).to_string()
+    }
+
+    pub fn rows(&self) -> RawLines {
+        self.content.raw_lines()
     }
 
     pub fn len(&self) -> usize {

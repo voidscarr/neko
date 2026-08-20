@@ -52,7 +52,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       const std::string clipboardText =
           QApplication::clipboard()->text().toStdString();
 
-      m_editor->insert_char(clipboardText.c_str());
+      m_editor->insert_char(m_editor->cursor_to_index(), clipboardText.c_str());
 
       repaint();
       return;
@@ -72,17 +72,26 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   switch (event->key()) {
   case Qt::Key_Enter:
   case Qt::Key_Return:
-    m_editor->insert_char("\n");
+    m_editor->insert_char(m_editor->cursor_to_index(), "\n");
     break;
   case Qt::Key_Tab:
     // TODO: Make this configurable for \t or 2/4/8+ spaces
-    m_editor->insert_char("    ");
+    m_editor->insert_char(m_editor->cursor_to_index(), "    ");
     break;
   case Qt::Key_Backspace:
     m_editor->remove_char(m_editor->content_len() - 1, m_editor->content_len());
     break;
+
+  case Qt::Key_Left:
+    m_editor->move_left(1);
+    break;
+  case Qt::Key_Right:
+    m_editor->move_right(1);
+    break;
+
   default:
-    m_editor->insert_char(event->text().toStdString().c_str());
+    m_editor->insert_char(m_editor->cursor_to_index(),
+                          event->text().toStdString().c_str());
     break;
   }
 

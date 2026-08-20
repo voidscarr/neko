@@ -19,4 +19,26 @@ impl Cursor {
             sticky_column: 0,
         }
     }
+
+    pub fn row(&self) -> usize {
+        self.row
+    }
+
+    pub fn column(&self) -> usize {
+        self.column
+    }
+
+    pub fn sticky_column(&self) -> usize {
+        self.sticky_column
+    }
+
+    pub fn move_right(&mut self, amount: usize) {
+        self.column = self.column.saturating_add(amount);
+        self.sticky_column = self.column;
+    }
+
+    pub fn move_left(&mut self, amount: usize) {
+        self.column = self.column.saturating_sub(amount);
+        self.sticky_column = self.column;
+    }
 }
