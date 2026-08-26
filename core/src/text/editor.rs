@@ -50,7 +50,7 @@ impl Editor {
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
         self.buffer.remove_char(range_start, range_end);
-        self.cursor.move_left(range_end - range_start);
+        self.cursor.move_left(range_start, range_end);
     }
 
     pub fn content_slice(&self, range_start: usize, range_end: usize) -> String {
@@ -62,7 +62,7 @@ impl Editor {
     }
 
     pub fn move_left(&mut self, amount: usize) {
-        self.cursor.move_left(amount);
+        self.cursor.move_left(0, amount);
     }
 
     pub fn move_right(&mut self, amount: usize) {

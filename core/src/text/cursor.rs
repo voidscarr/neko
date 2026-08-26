@@ -37,8 +37,12 @@ impl Cursor {
         self.sticky_column = self.column;
     }
 
-    pub fn move_left(&mut self, amount: usize) {
-        self.column = self.column.saturating_sub(amount);
+    pub fn move_left(&mut self, range_start: usize, range_end: usize) {
+        if range_start > range_end {
+            return;
+        }
+
+        self.column = self.column.saturating_sub(range_end - range_start);
         self.sticky_column = self.column;
     }
 }
