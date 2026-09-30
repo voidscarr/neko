@@ -37,6 +37,10 @@ impl Buffer {
         self.content.raw_lines()
     }
 
+    pub fn row_len(&self, row: usize) -> usize {
+        self.content.line(row).byte_len()
+    }
+
     pub fn len(&self) -> usize {
         self.content.byte_len()
     }

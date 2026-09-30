@@ -29,14 +29,13 @@ impl Editor {
     pub fn cursor_to_index(&self) -> usize {
         let mut total = 0;
 
-        _ = self.buffer.rows().enumerate().map(|(i, slice)| {
+        for (i, slice) in self.buffer.rows().enumerate() {
             if i == self.cursor.row() {
-                return total;
+                return self.cursor.column();
             }
 
             total += slice.byte_len();
-            total
-        });
+        }
 
         total += self.cursor.column();
         total
@@ -45,7 +44,19 @@ impl Editor {
     pub fn insert_char(&mut self, index: usize, text: &str) {
         self.buffer.insert_char(index, text);
         // TODO: Adjust to consider graphemes
-        self.cursor.move_right(text.len());
+
+        if text.contains("\n") {
+            for _ in text.lines() {
+                self.cursor.move_down(
+                    1,
+                    self.cursor.row(),
+                    self.buffer.len(),
+                    self.buffer.row_len(self.cursor.row().saturating_add(1)),
+                );
+            }
+        }
+
+        self.cursor.move_right(text.len(), self.buffer.len());
     }
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
@@ -66,6 +77,15 @@ impl Editor {
     }
 
     pub fn move_right(&mut self, amount: usize) {
-        self.cursor.move_right(amount);
+        self.cursor.move_right(amount, self.buffer.len());
+    }
+
+    pub fn move_down(&mut self, amount: usize) {
+        self.cursor.move_down(
+            amount,
+            self.cursor.row(),
+            self.buffer.rows().len(),
+            self.buffer.row_len(self.cursor.row().saturating_add(1)),
+        );
     }
 }

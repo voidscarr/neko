@@ -21,5 +21,6 @@ mod ffi {
         fn content_len(self: &Editor) -> usize;
         fn move_left(&mut self, amount: usize);
         fn move_right(&mut self, amount: usize);
+        fn move_down(&mut self, amount: usize);
     }
 }
