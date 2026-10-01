@@ -29,15 +29,10 @@ impl Editor {
     pub fn cursor_to_index(&self) -> usize {
         let mut total = 0;
 
-        for (i, slice) in self.buffer.rows().enumerate() {
-            if i == self.cursor.row() {
-                return self.cursor.column();
-            }
-
+        for slice in self.buffer.rows() {
             total += slice.byte_len();
         }
 
-        total += self.cursor.column();
         total
     }
 
@@ -54,9 +49,9 @@ impl Editor {
                     self.buffer.row_len(self.cursor.row().saturating_add(1)),
                 );
             }
+        } else {
+            self.cursor.move_right(text.len(), self.buffer.len());
         }
-
-        self.cursor.move_right(text.len(), self.buffer.len());
     }
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
