@@ -20,9 +20,10 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   // Background
   painter.fillRect(rect(), "black");
 
-  // Text
   // TODO: Add theming
-  painter.setPen("white");
+  // Text
+  painter.setPen("#ffffff");
+  painter.setBrush("#ffffff");
   painter.setFont(m_font);
 
   // TODO: Implement line wrapping option toggle
@@ -32,6 +33,19 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   painter.drawText(rect(),
                    m_editor->content_slice(0, m_editor->content_len()).c_str(),
                    qTextOption);
+
+  // Cursor
+  const auto fontMetrics = QFontMetricsF(m_font);
+  const auto charWidth = fontMetrics.averageCharWidth();
+  const auto lineHeight = fontMetrics.height();
+
+  const auto cursorX = m_editor->cursor_col() * charWidth;
+  const auto cursorY = m_editor->cursor_row() * lineHeight;
+
+  painter.setPen("#a162a1");
+  painter.setBrush(QColor("#a162a1"));
+  painter.drawRect(
+      QRectF(QPointF(cursorX, cursorY), QSizeF(CURSOR_WIDTH, lineHeight)));
 }
 
 void EditorWidget::keyPressEvent(QKeyEvent *event) {

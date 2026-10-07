@@ -17,6 +17,8 @@ mod ffi {
         fn insert_char(self: &mut Editor, index: usize, text: &str);
         fn remove_char(self: &mut Editor, range_start: usize, range_end: usize);
         fn cursor_to_index(self: &Editor) -> usize;
+        fn cursor_col(self: &Editor) -> usize;
+        fn cursor_row(self: &Editor) -> usize;
         fn content_slice(self: &Editor, range_start: usize, range_end: usize) -> String;
         fn content_len(self: &Editor) -> usize;
         fn move_left(&mut self, amount: usize);

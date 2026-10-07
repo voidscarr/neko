@@ -27,11 +27,24 @@ impl Editor {
     pub fn cursor_to_index(&self) -> usize {
         let mut total = 0;
 
-        for slice in self.buffer.rows() {
+        for (i, slice) in self.buffer.rows().enumerate() {
+            if i == self.cursor.row() {
+                total += self.cursor.column();
+                break;
+            }
+
             total += slice.byte_len();
         }
 
         total
+    }
+
+    pub fn cursor_col(self: &Editor) -> usize {
+        self.cursor.column()
+    }
+
+    pub fn cursor_row(self: &Editor) -> usize {
+        self.cursor.row()
     }
 
     pub fn insert_char(&mut self, index: usize, text: &str) {

@@ -17,4 +17,6 @@ private:
   QFont m_font;
   QFontMetricsF m_fontMetrics;
   rust::Box<Editor> m_editor;
+
+  const int CURSOR_WIDTH = 1.0;
 };
