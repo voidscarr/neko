@@ -91,6 +91,9 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   case Qt::Key_Down:
     m_editor->move_down(1);
     break;
+  case Qt::Key_Up:
+    m_editor->move_up(1);
+    break;
 
   default:
     m_editor->insert_char(m_editor->cursor_to_index(),

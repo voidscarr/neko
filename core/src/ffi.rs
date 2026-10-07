@@ -22,5 +22,6 @@ mod ffi {
         fn move_left(&mut self, amount: usize);
         fn move_right(&mut self, amount: usize);
         fn move_down(&mut self, amount: usize);
+        fn move_up(&mut self, amount: usize);
     }
 }

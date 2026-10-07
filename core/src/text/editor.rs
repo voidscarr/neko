@@ -92,4 +92,12 @@ impl Editor {
             self.buffer.row_len(self.cursor.row().saturating_add(1)),
         );
     }
+
+    pub fn move_up(&mut self, amount: usize) {
+        self.cursor.move_up(
+            amount,
+            self.cursor.row(),
+            self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+        );
+    }
 }
