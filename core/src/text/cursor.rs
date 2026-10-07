@@ -67,4 +67,16 @@ impl Cursor {
         self.row = self.row.saturating_add(amount);
         self.column = self.sticky_column.min(target_row_len);
     }
+
+    pub fn move_up(&mut self, amount: usize, curr_row: usize, target_row_len: usize) {
+        if curr_row == 0 {
+            // Move to the start of the current row.
+            self.column = 0;
+            return;
+        }
+
+        // Move up a row (and try to preserve the current column).
+        self.row = self.row.saturating_sub(amount);
+        self.column = self.sticky_column.min(target_row_len);
+    }
 }

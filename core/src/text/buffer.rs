@@ -21,12 +21,15 @@ impl Buffer {
         self.content.insert(index, text);
     }
 
-    pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
+    pub fn remove_char(&mut self, range_start: usize, range_end: usize) -> String {
         if range_start > range_end || range_end > self.len() {
-            return;
+            return String::new();
         }
 
+        let deleted_str = self.content_slice(range_start, range_end);
         self.content.delete(range_start..range_end);
+
+        deleted_str
     }
 
     pub fn content_slice(&self, range_start: usize, range_end: usize) -> String {

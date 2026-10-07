@@ -1,5 +1,3 @@
-use crop::iter::RawLines;
-
 use super::{Buffer, Cursor, Selection};
 
 /// A single editor instance. Holds relevant document information like the cursor, selection,
@@ -55,7 +53,18 @@ impl Editor {
     }
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
-        self.buffer.remove_char(range_start, range_end);
+        let deleted_str = self.buffer.remove_char(range_start, range_end);
+
+        for c in deleted_str.chars() {
+            if c == '\n' {
+                self.cursor.move_up(
+                    1,
+                    self.cursor.row(),
+                    self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+                )
+            }
+        }
+
         self.cursor.move_left(range_start, range_end);
     }
 
