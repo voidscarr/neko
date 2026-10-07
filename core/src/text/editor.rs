@@ -53,12 +53,8 @@ impl Editor {
 
         if text.contains("\n") {
             for _ in text.lines() {
-                self.cursor.move_down(
-                    1,
-                    self.cursor.row(),
-                    self.buffer.len(),
-                    self.buffer.row_len(self.cursor.row().saturating_add(1)),
-                );
+                self.cursor
+                    .move_down(1, self.cursor.row(), self.buffer.len(), 0);
             }
         } else {
             self.cursor.move_right(text.len(), self.buffer.len());
