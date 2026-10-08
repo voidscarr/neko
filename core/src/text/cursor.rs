@@ -41,8 +41,11 @@ impl Cursor {
         self.sticky_column = self.column;
     }
 
-    pub fn move_left(&mut self, amount: usize, curr_col: usize) {
+    pub fn move_left(&mut self, amount: usize, curr_col: usize, prev_row_len: usize) {
         if amount > curr_col {
+            self.row = self.row.saturating_sub(amount);
+            self.column = prev_row_len;
+            self.sticky_column = self.column;
             return;
         }
 

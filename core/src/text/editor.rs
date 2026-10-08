@@ -64,17 +64,12 @@ impl Editor {
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
         let deleted_str = self.buffer.remove_char(range_start, range_end);
 
-        for c in deleted_str.chars() {
-            if c == '\n' {
-                self.cursor.move_up(
-                    1,
-                    self.cursor.row(),
-                    self.buffer.row_len(self.cursor.row().saturating_sub(1)),
-                )
-            } else {
-                self.cursor
-                    .move_left(range_end - range_start, self.cursor.column());
-            }
+        for _ in deleted_str.chars() {
+            self.cursor.move_left(
+                range_end - range_start,
+                self.cursor.column(),
+                self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+            );
         }
     }
 
@@ -87,7 +82,11 @@ impl Editor {
     }
 
     pub fn move_left(&mut self, amount: usize) {
-        self.cursor.move_left(amount, self.cursor.column());
+        self.cursor.move_left(
+            amount,
+            self.cursor.column(),
+            self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+        );
     }
 
     pub fn move_right(&mut self, amount: usize) {
