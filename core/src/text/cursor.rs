@@ -41,12 +41,12 @@ impl Cursor {
         self.sticky_column = self.column;
     }
 
-    pub fn move_left(&mut self, range_start: usize, range_end: usize) {
-        if range_start > range_end {
+    pub fn move_left(&mut self, amount: usize, curr_col: usize) {
+        if amount > curr_col {
             return;
         }
 
-        self.column = self.column.saturating_sub(range_end - range_start);
+        self.column = self.column.saturating_sub(amount);
         self.sticky_column = self.column;
     }
 
@@ -60,6 +60,7 @@ impl Cursor {
         if curr_row >= total_rows {
             // Move to the end of the current row.
             self.column = target_row_len;
+            self.sticky_column = self.column;
             return;
         }
 
@@ -72,6 +73,7 @@ impl Cursor {
         if curr_row == 0 {
             // Move to the start of the current row.
             self.column = 0;
+            self.sticky_column = self.column;
             return;
         }
 

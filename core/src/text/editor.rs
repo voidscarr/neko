@@ -71,10 +71,11 @@ impl Editor {
                     self.cursor.row(),
                     self.buffer.row_len(self.cursor.row().saturating_sub(1)),
                 )
+            } else {
+                self.cursor
+                    .move_left(range_end - range_start, self.cursor.column());
             }
         }
-
-        self.cursor.move_left(range_start, range_end);
     }
 
     pub fn content_slice(&self, range_start: usize, range_end: usize) -> String {
@@ -86,7 +87,7 @@ impl Editor {
     }
 
     pub fn move_left(&mut self, amount: usize) {
-        self.cursor.move_left(0, amount);
+        self.cursor.move_left(amount, self.cursor.column());
     }
 
     pub fn move_right(&mut self, amount: usize) {
