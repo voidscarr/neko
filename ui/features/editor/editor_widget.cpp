@@ -26,19 +26,18 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   painter.setBrush("#ffffff");
   painter.setFont(m_font);
 
-  // TODO: Implement line wrapping option toggle
-  QTextOption qTextOption;
-  qTextOption.setWrapMode(QTextOption::NoWrap);
-
-  painter.drawText(rect(),
-                   m_editor->content_slice(0, m_editor->content_len()).c_str(),
-                   qTextOption);
-
-  // Cursor
   const auto fontMetrics = QFontMetricsF(m_font);
   const auto charWidth = fontMetrics.averageCharWidth();
   const auto lineHeight = fontMetrics.height();
 
+  // TODO: Implement line wrapping option toggle
+  for (int i = 0; i < m_editor->num_rows(); i++) {
+    painter.drawText(
+        0, (i + 1) * fontMetrics.height() - (fontMetrics.height() / 4),
+        m_editor->line(i).c_str());
+  }
+
+  // Cursor
   const auto cursorX = m_editor->cursor_col() * charWidth;
   const auto cursorY = m_editor->cursor_row() * lineHeight;
 

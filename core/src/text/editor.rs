@@ -109,4 +109,16 @@ impl Editor {
             self.buffer.row_len(self.cursor.row().saturating_sub(1)),
         );
     }
+
+    pub fn num_rows(&self) -> usize {
+        self.buffer.rows().len()
+    }
+
+    pub fn line(self: &Editor, row: usize) -> String {
+        self.buffer
+            .rows()
+            .nth(row)
+            .expect("Unable to get line at specified row")
+            .to_string()
+    }
 }

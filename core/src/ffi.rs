@@ -20,10 +20,12 @@ mod ffi {
         fn cursor_col(self: &Editor) -> usize;
         fn cursor_row(self: &Editor) -> usize;
         fn content_slice(self: &Editor, range_start: usize, range_end: usize) -> String;
+        fn line(self: &Editor, row: usize) -> String;
         fn content_len(self: &Editor) -> usize;
         fn move_left(&mut self, amount: usize);
         fn move_right(&mut self, amount: usize);
         fn move_down(&mut self, amount: usize);
         fn move_up(&mut self, amount: usize);
+        fn num_rows(self: &Editor) -> usize;
     }
 }
