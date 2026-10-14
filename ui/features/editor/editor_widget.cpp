@@ -45,7 +45,7 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
     painter.setPen("#40a162a1");
     painter.setBrush(QColor("#40a162a1"));
 
-    for (int i = 0; i < selEnd.row - selStart.row; i++) {
+    for (int i = 0; i <= selEnd.row - selStart.row; i++) {
       const auto lineLength = m_editor->line_len(i);
 
       painter.drawRect(QRectF(QPointF(0, (lineHeight * i) - 1),

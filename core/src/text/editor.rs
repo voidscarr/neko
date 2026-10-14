@@ -89,6 +89,7 @@ impl Editor {
             let last_line_has_newline = self.buffer.last_line_has_newline();
             let adjusted_rows_len =
                 self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
+
             self.cursor.move_right(
                 text.len(),
                 self.buffer.len(),
@@ -184,7 +185,7 @@ impl Editor {
     }
 
     pub fn select_all(&mut self) {
-        let rows = self.buffer.rows().len();
+        let rows = self.buffer.rows().len() - 1;
         let last_row_len = self.buffer.row_len(rows);
 
         self.selection.select_all(rows, last_row_len);
