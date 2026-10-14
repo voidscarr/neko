@@ -72,8 +72,18 @@ impl Editor {
 
         if text.contains("\n") {
             for _ in text.lines() {
-                self.cursor
-                    .move_down(1, self.cursor.row(), self.buffer.len(), 0);
+                self.cursor.move_down(
+                    1,
+                    self.cursor.row(),
+                    self.buffer.rows().len()
+                        - if self.buffer.last_line_has_newline() {
+                            0
+                        } else {
+                            1
+                        },
+                    self.buffer.row_len(self.cursor.row()),
+                    0,
+                );
             }
         } else {
             self.cursor.move_right(text.len(), self.buffer.len());
@@ -127,11 +137,14 @@ impl Editor {
     }
 
     pub fn move_down(&mut self, amount: usize) {
+        let last_line_has_newline = self.buffer.last_line_has_newline();
+
         self.cursor.move_down(
             amount,
             self.cursor.row(),
-            self.buffer.rows().len(),
-            self.buffer.row_len(self.cursor.row().saturating_add(1)),
+            self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 },
+            self.buffer.row_len(self.cursor.row()),
+            self.buffer.row_len(self.cursor.row()),
         );
     }
 

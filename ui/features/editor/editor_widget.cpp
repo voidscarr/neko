@@ -41,13 +41,10 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   if (m_editor->selection_active()) {
     const auto selStart = selection_start_ffi(m_editor);
     const auto selEnd = selection_end_ffi(m_editor);
+
     painter.setPen("#40a162a1");
     painter.setBrush(QColor("#40a162a1"));
 
-    // First line
-    painter.drawRect(QRectF(QPointF(), QPointF()));
-
-    // Middle lines
     for (int i = 0; i < selEnd.row - selStart.row; i++) {
       const auto lineLength = m_editor->line_len(i);
 

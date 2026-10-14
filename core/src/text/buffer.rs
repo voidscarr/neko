@@ -44,7 +44,7 @@ impl Buffer {
         if row == self.rows().len() || self.rows().len() == 0 {
             0
         } else {
-            self.content.line_slice(row..row + 1).byte_len()
+            self.content.line(row).byte_len()
         }
     }
 
@@ -54,5 +54,13 @@ impl Buffer {
 
     pub fn is_empty(&self) -> bool {
         self.content.is_empty()
+    }
+
+    pub fn last_line_has_newline(&self) -> bool {
+        self.content
+            .chars()
+            .next_back()
+            .expect("Unable to get last char.")
+            == '\n'
     }
 }

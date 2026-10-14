@@ -78,11 +78,12 @@ impl Cursor {
         amount: usize,
         curr_row: usize,
         total_rows: usize,
+        current_row_len: usize,
         target_row_len: usize,
     ) {
         if curr_row >= total_rows {
             // Move to the end of the current row.
-            self.column = target_row_len;
+            self.column = current_row_len;
             self.sticky_column = self.column;
             return;
         }
