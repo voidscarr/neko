@@ -69,10 +69,10 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
 void EditorWidget::keyPressEvent(QKeyEvent *event) {
   auto ctrlActive =
       event->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier);
-  // auto cmdActive =
-  //     event->modifiers().testFlag(Qt::KeyboardModifier::MetaModifier);
-  // auto altActive =
-  //     event->modifiers().testFlag(Qt::KeyboardModifier::AltModifier);
+  auto cmdActive =
+      event->modifiers().testFlag(Qt::KeyboardModifier::MetaModifier);
+  auto altActive =
+      event->modifiers().testFlag(Qt::KeyboardModifier::AltModifier);
 
   bool selectionActive = m_editor->selection_active();
 
@@ -168,6 +168,11 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
     break;
 
   default: {
+    // Skip char entry if a modifier is pressed by itself.
+    if (ctrlActive || cmdActive || altActive) {
+      return;
+    }
+
     const auto c =
         makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
     m_editor->insert_char(pos_to_index_ffi(*m_editor, c),
