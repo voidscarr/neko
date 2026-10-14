@@ -30,6 +30,7 @@ mod ffi {
         fn selection_active(self: &Editor) -> bool;
         fn delete_selection_and_clear(self: &mut Editor);
         fn content_slice(self: &Editor, range_start: usize, range_end: usize) -> String;
+        fn selected_text(self: &Editor) -> String;
         fn line(self: &Editor, row: usize) -> String;
         fn line_len(self: &Editor, row: usize) -> usize;
         fn content_len(self: &Editor) -> usize;

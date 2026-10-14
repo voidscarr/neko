@@ -103,8 +103,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
     }
     case Qt::Key_C: {
       if (selectionActive) {
-        // TODO: CHANGE THIS
-        const std::string text = "test";
+        const std::string text = m_editor->selected_text().c_str();
         QApplication::clipboard()->setText(text.c_str());
       }
 
@@ -113,8 +112,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
     }
     case Qt::Key_X: {
       if (selectionActive) {
-        // TODO: CHANGE THIS
-        const std::string text = "test";
+        const std::string text = m_editor->selected_text().c_str();
         QApplication::clipboard()->setText(text.c_str());
       }
       m_editor->delete_selection_and_clear();

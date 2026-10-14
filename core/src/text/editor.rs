@@ -152,6 +152,13 @@ impl Editor {
         self.cursor.move_to(rows, last_row_len, rows, last_row_len);
     }
 
+    pub fn selected_text(&self) -> String {
+        let start = self.pos_to_index(&self.selection.start());
+        let end = self.pos_to_index(&self.selection.end());
+
+        self.buffer.content_slice(start, end)
+    }
+
     pub fn num_rows(&self) -> usize {
         self.buffer.rows().len()
     }
