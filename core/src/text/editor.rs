@@ -138,13 +138,21 @@ impl Editor {
 
     pub fn move_down(&mut self, amount: usize) {
         let last_line_has_newline = self.buffer.last_line_has_newline();
+        let adjusted_rows_len =
+            self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
+        let adjusted_target_row = if self.cursor.row() == adjusted_rows_len {
+            0
+        } else {
+            1
+        };
 
         self.cursor.move_down(
             amount,
             self.cursor.row(),
-            self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 },
+            adjusted_rows_len,
             self.buffer.row_len(self.cursor.row()),
-            self.buffer.row_len(self.cursor.row()),
+            self.buffer
+                .row_len(self.cursor.row().saturating_add(adjusted_target_row)),
         );
     }
 
