@@ -41,7 +41,7 @@ impl Buffer {
     }
 
     pub fn row_len(&self, row: usize) -> usize {
-        if row == self.rows().len() {
+        if row == self.rows().len() || self.rows().len() == 0 {
             0
         } else {
             self.content.line_slice(row..row + 1).byte_len()

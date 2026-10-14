@@ -37,6 +37,25 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
         m_editor->line(i).c_str());
   }
 
+  // Selection
+  if (m_editor->selection_active()) {
+    const auto selStart = selection_start_ffi(m_editor);
+    const auto selEnd = selection_end_ffi(m_editor);
+    painter.setPen("#40a162a1");
+    painter.setBrush(QColor("#40a162a1"));
+
+    // First line
+    painter.drawRect(QRectF(QPointF(), QPointF()));
+
+    // Middle lines
+    for (int i = 0; i < selEnd.row - selStart.row; i++) {
+      const auto lineLength = m_editor->line_len(i);
+
+      painter.drawRect(QRectF(QPointF(0, (lineHeight * i) - 1),
+                              QSizeF(charWidth * lineLength, lineHeight)));
+    }
+  }
+
   // Cursor
   const auto cursorX = m_editor->cursor_col() * charWidth;
   const auto cursorY = m_editor->cursor_row() * lineHeight;
@@ -55,26 +74,50 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   // auto altActive =
   //     event->modifiers().testFlag(Qt::KeyboardModifier::AltModifier);
 
+  bool selectionActive = m_editor->selection_active();
+
   if (ctrlActive) {
     switch (event->key()) {
     case Qt::Key_A:
-      // TODO: Add select all
+      m_editor->select_all();
+
       repaint();
       return;
     case Qt::Key_V: {
       const std::string clipboardText =
           QApplication::clipboard()->text().toStdString();
 
-      m_editor->insert_char(m_editor->cursor_to_index(), clipboardText.c_str());
+      m_editor->delete_selection_and_clear();
+
+      const auto c = CursorFFI{
+          .row = m_editor->cursor_row(),
+          .column = m_editor->cursor_col(),
+          .sticky_column = m_editor->cursor_col(),
+      };
+
+      m_editor->insert_char(pos_to_index_ffi(*m_editor, c),
+                            clipboardText.c_str());
 
       repaint();
       return;
     }
-    case Qt::Key_C:
+    case Qt::Key_C: {
+      if (selectionActive) {
+        // TODO: CHANGE THIS
+        const std::string text = "test";
+        QApplication::clipboard()->setText(text.c_str());
+      }
+
+      repaint();
+      return;
+    }
     case Qt::Key_X: {
-      // TODO: Add actual selections
-      const std::string text = "test";
-      QApplication::clipboard()->setText(text.c_str());
+      if (selectionActive) {
+        // TODO: CHANGE THIS
+        const std::string text = "test";
+        QApplication::clipboard()->setText(text.c_str());
+      }
+      m_editor->delete_selection_and_clear();
 
       repaint();
       return;
@@ -84,35 +127,66 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
 
   switch (event->key()) {
   case Qt::Key_Enter:
-  case Qt::Key_Return:
-    m_editor->insert_char(m_editor->cursor_to_index(), "\n");
+  case Qt::Key_Return: {
+    const auto c =
+        makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
+
+    m_editor->insert_char(pos_to_index_ffi(*m_editor, c), "\n");
     break;
-  case Qt::Key_Tab:
+  }
+  case Qt::Key_Tab: {
+    const auto c =
+        makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
+
     // TODO: Make this configurable for \t or 2/4/8+ spaces
-    m_editor->insert_char(m_editor->cursor_to_index(), "    ");
+    m_editor->insert_char(pos_to_index_ffi(*m_editor, c), "    ");
     break;
+  }
   case Qt::Key_Backspace:
-    m_editor->remove_char(m_editor->content_len() - 1, m_editor->content_len());
+    if (!selectionActive) {
+      m_editor->remove_char(m_editor->content_len() - 1,
+                            m_editor->content_len());
+    } else {
+      m_editor->delete_selection_and_clear();
+    }
+
     break;
 
   case Qt::Key_Left:
+    // TODO: Deselect
     m_editor->move_left(1);
     break;
   case Qt::Key_Right:
+    // TODO: Deselect
     m_editor->move_right(1);
     break;
   case Qt::Key_Down:
+    // TODO: Deselect
     m_editor->move_down(1);
     break;
   case Qt::Key_Up:
+    // TODO: Deselect
     m_editor->move_up(1);
     break;
 
-  default:
-    m_editor->insert_char(m_editor->cursor_to_index(),
+  default: {
+    const auto c =
+        makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
+    m_editor->insert_char(pos_to_index_ffi(*m_editor, c),
                           event->text().toStdString().c_str());
     break;
   }
+  }
 
   repaint();
+}
+
+CursorFFI EditorWidget::makeCursorFFI(std::size_t row, std::size_t column) {
+  const auto c = CursorFFI{
+      .row = m_editor->cursor_row(),
+      .column = m_editor->cursor_col(),
+      .sticky_column = m_editor->cursor_col(),
+  };
+
+  return c;
 }

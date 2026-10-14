@@ -24,12 +24,12 @@ impl Editor {
         }
     }
 
-    pub fn cursor_to_index(&self) -> usize {
+    pub fn pos_to_index(&self, cursor: &Cursor) -> usize {
         let mut total = 0;
 
         for (i, slice) in self.buffer.rows().enumerate() {
-            if i == self.cursor.row() {
-                total += self.cursor.column();
+            if i == cursor.row() {
+                total += cursor.column();
                 break;
             }
 
@@ -47,7 +47,26 @@ impl Editor {
         self.cursor.row()
     }
 
-    pub fn insert_char(&mut self, index: usize, text: &str) {
+    pub fn selection_start(self: &Editor) -> Cursor {
+        self.selection.start()
+    }
+
+    pub fn selection_end(self: &Editor) -> Cursor {
+        self.selection.end()
+    }
+
+    pub fn insert_char(&mut self, mut index: usize, text: &str) {
+        if self.selection.active() {
+            let start = self.pos_to_index(&self.selection.start());
+            let end = self.pos_to_index(&self.selection.end());
+
+            self.remove_char(start, end);
+            self.selection.clear_active();
+
+            // Adjust index to selection start.
+            index = start;
+        }
+
         self.buffer.insert_char(index, text);
         // TODO: Adjust to consider graphemes
 
@@ -73,12 +92,26 @@ impl Editor {
         }
     }
 
+    pub fn delete_selection_and_clear(&mut self) {
+        if self.selection.active() {
+            let start = self.pos_to_index(&self.selection.start());
+            let end = self.pos_to_index(&self.selection.end());
+
+            self.remove_char(start, end);
+            self.selection.clear_active();
+        }
+    }
+
     pub fn content_slice(&self, range_start: usize, range_end: usize) -> String {
         self.buffer.content_slice(range_start, range_end)
     }
 
     pub fn content_len(&self) -> usize {
         self.buffer.len()
+    }
+
+    pub fn selection_active(&self) -> bool {
+        self.selection.active()
     }
 
     pub fn move_left(&mut self, amount: usize) {
@@ -110,15 +143,28 @@ impl Editor {
         );
     }
 
+    pub fn select_all(&mut self) {
+        let rows = self.buffer.rows().len();
+        let last_row_len = self.buffer.row_len(rows);
+
+        self.selection.select_all(rows, last_row_len);
+        self.selection.set_active();
+        self.cursor.move_to(rows, last_row_len, rows, last_row_len);
+    }
+
     pub fn num_rows(&self) -> usize {
         self.buffer.rows().len()
     }
 
-    pub fn line(self: &Editor, row: usize) -> String {
+    pub fn line(&self, row: usize) -> String {
         self.buffer
             .rows()
             .nth(row)
             .expect("Unable to get line at specified row")
             .to_string()
+    }
+
+    pub fn line_len(&self, row: usize) -> usize {
+        self.buffer.row_len(row)
     }
 }

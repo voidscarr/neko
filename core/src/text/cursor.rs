@@ -1,8 +1,20 @@
+use std::fmt::Display;
+
 #[derive(Debug, Clone, Copy)]
 pub struct Cursor {
     row: usize,
     column: usize,
     sticky_column: usize,
+}
+
+impl Display for Cursor {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "Cursor({0}, {1}, {2})",
+            self.row, self.column, self.sticky_column
+        )
+    }
 }
 
 impl Default for Cursor {
@@ -17,6 +29,14 @@ impl Cursor {
             row: 0,
             column: 0,
             sticky_column: 0,
+        }
+    }
+
+    pub fn at(row: usize, column: usize) -> Self {
+        Self {
+            row,
+            column,
+            sticky_column: column,
         }
     }
 
@@ -83,5 +103,13 @@ impl Cursor {
         // Move up a row (and try to preserve the current column).
         self.row = self.row.saturating_sub(amount);
         self.column = self.sticky_column.min(target_row_len);
+    }
+
+    pub fn move_to(&mut self, row: usize, column: usize, total_rows: usize, target_row_len: usize) {
+        row.clamp(0, total_rows);
+        column.clamp(0, target_row_len);
+
+        self.row = row;
+        self.column = column;
     }
 }
