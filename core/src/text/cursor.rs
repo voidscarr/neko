@@ -52,8 +52,18 @@ impl Cursor {
         self.sticky_column
     }
 
-    pub fn move_right(&mut self, amount: usize, max_length: usize) {
-        if self.column + amount > max_length {
+    pub fn move_right(
+        &mut self,
+        amount: usize,
+        max_length: usize,
+        curr_row: usize,
+        total_rows: usize,
+    ) {
+        if self.column + amount > max_length && curr_row < total_rows {
+            self.column = 0;
+            self.row = self.row.saturating_add(1);
+            return;
+        } else if self.column + amount > max_length {
             return;
         }
 
@@ -61,8 +71,16 @@ impl Cursor {
         self.sticky_column = self.column;
     }
 
-    pub fn move_left(&mut self, amount: usize, curr_col: usize, prev_row_len: usize) {
-        if amount > curr_col {
+    pub fn move_left(
+        &mut self,
+        amount: usize,
+        curr_col: usize,
+        curr_row: usize,
+        prev_row_len: usize,
+    ) {
+        if curr_col == 0 && curr_row == 0 {
+            return;
+        } else if amount > curr_col {
             self.row = self.row.saturating_sub(amount);
             self.column = prev_row_len;
             self.sticky_column = self.column;
@@ -106,10 +124,7 @@ impl Cursor {
         self.column = self.sticky_column.min(target_row_len);
     }
 
-    pub fn move_to(&mut self, row: usize, column: usize, total_rows: usize, target_row_len: usize) {
-        row.clamp(0, total_rows);
-        column.clamp(0, target_row_len);
-
+    pub fn move_to(&mut self, row: usize, column: usize) {
         self.row = row;
         self.column = column;
     }

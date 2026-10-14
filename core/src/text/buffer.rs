@@ -57,6 +57,10 @@ impl Buffer {
     }
 
     pub fn last_line_has_newline(&self) -> bool {
+        if self.content.is_empty() {
+            return false;
+        }
+
         self.content
             .chars()
             .next_back()

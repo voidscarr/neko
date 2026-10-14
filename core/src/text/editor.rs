@@ -86,7 +86,15 @@ impl Editor {
                 );
             }
         } else {
-            self.cursor.move_right(text.len(), self.buffer.len());
+            let last_line_has_newline = self.buffer.last_line_has_newline();
+            let adjusted_rows_len =
+                self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
+            self.cursor.move_right(
+                text.len(),
+                self.buffer.len(),
+                self.cursor.row(),
+                adjusted_rows_len,
+            );
         }
     }
 
@@ -97,6 +105,7 @@ impl Editor {
             self.cursor.move_left(
                 range_end - range_start,
                 self.cursor.column(),
+                self.cursor.row(),
                 self.buffer.row_len(self.cursor.row().saturating_sub(1)),
             );
         }
@@ -128,12 +137,22 @@ impl Editor {
         self.cursor.move_left(
             amount,
             self.cursor.column(),
+            self.cursor.row(),
             self.buffer.row_len(self.cursor.row().saturating_sub(1)),
         );
     }
 
     pub fn move_right(&mut self, amount: usize) {
-        self.cursor.move_right(amount, self.buffer.len());
+        let last_line_has_newline = self.buffer.last_line_has_newline();
+        let adjusted_rows_len =
+            self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
+
+        self.cursor.move_right(
+            amount,
+            self.buffer.row_len(self.cursor.row()),
+            self.cursor.row(),
+            adjusted_rows_len,
+        );
     }
 
     pub fn move_down(&mut self, amount: usize) {
@@ -170,7 +189,7 @@ impl Editor {
 
         self.selection.select_all(rows, last_row_len);
         self.selection.set_active();
-        self.cursor.move_to(rows, last_row_len, rows, last_row_len);
+        self.cursor.move_to(rows, last_row_len);
     }
 
     pub fn selected_text(&self) -> String {

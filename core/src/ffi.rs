@@ -67,9 +67,7 @@ fn selection_end_ffi(editor: &Editor) -> CursorFFI {
 
 fn pos_to_index_ffi(editor: &Editor, cursor: &CursorFFI) -> usize {
     let mut c = Cursor::new();
-    let rows = editor.num_rows();
-    let last_row_len = editor.line_len(rows);
 
-    c.move_to(cursor.row, cursor.column, rows, last_row_len);
+    c.move_to(cursor.row, cursor.column);
     editor.pos_to_index(&c)
 }
