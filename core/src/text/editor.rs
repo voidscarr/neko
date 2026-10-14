@@ -185,7 +185,8 @@ impl Editor {
     }
 
     pub fn select_all(&mut self) {
-        let rows = self.buffer.rows().len() - 1;
+        let last_line_has_newline = self.buffer.last_line_has_newline();
+        let rows = self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
         let last_row_len = self.buffer.row_len(rows);
 
         self.selection.select_all(rows, last_row_len);
