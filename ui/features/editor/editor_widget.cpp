@@ -74,7 +74,7 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
 
   for (int i = startingLine;
        i < m_editor->num_rows() && i < endingLine + LINE_DRAWING_BUFFER; i++) {
-    painter.drawText(0,
+    painter.drawText(-horizontalScrollBar()->value(),
                      ((i + 1 - startingLine) * fontMetrics.height() -
                       (fontMetrics.height() / 4)),
                      m_editor->line(i).c_str());
