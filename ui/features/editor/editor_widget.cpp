@@ -8,17 +8,56 @@
 EditorWidget::EditorWidget(QWidget *parent)
     : m_font(QFont("IBM Plex Mono", 15.0)),
       m_fontMetrics(QFontMetricsF(m_font)), m_editor(new_editor()),
-      QWidget(parent) {
+      QAbstractScrollArea(parent) {
   setAutoFillBackground(false);
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   focusWidget();
 }
 
+void EditorWidget::resizeEvent(QResizeEvent *event) { performResize(); }
+
+void EditorWidget::wheelEvent(QWheelEvent *event) {
+  horizontalScrollBar()->setValue(horizontalScrollBar()->value() +
+                                  (event->angleDelta().x() / 8));
+  verticalScrollBar()->setValue(verticalScrollBar()->value() +
+                                (event->angleDelta().y() / 8));
+}
+
+QSize EditorWidget::calculateResize() {
+  const auto viewportHeight = viewport()->height();
+  const auto viewportWidth = viewport()->width();
+
+  const auto rows = m_editor->num_rows();
+  std::size_t maxChars = 0;
+
+  for (int i = 0; i < rows; i++) {
+    maxChars = qMax(maxChars, m_editor->line_len(i));
+  }
+
+  int contentHeight = rows * m_fontMetrics.height();
+  int contentWidth = maxChars * m_fontMetrics.averageCharWidth();
+
+  return QSize(contentWidth - viewportWidth + VIEWPORT_PADDING,
+               contentHeight - viewportHeight + VIEWPORT_PADDING);
+}
+
+void EditorWidget::performResize() {
+  const auto size = calculateResize();
+
+  horizontalScrollBar()->setRange(0, size.width());
+  verticalScrollBar()->setRange(0, size.height());
+  updateGeometry();
+}
+
 void EditorWidget::paintEvent(QPaintEvent *event) {
-  QPainter painter(this);
+  QPainter painter(viewport());
 
   // Background
   painter.fillRect(rect(), "black");
+
+  // Translate to account for scrollbars.
+  painter.translate(-horizontalScrollBar()->value(),
+                    -verticalScrollBar()->value());
 
   // TODO: Add theming
   // Text
@@ -78,7 +117,8 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
     case Qt::Key_A:
       m_editor->select_all();
 
-      repaint();
+      performResize();
+      viewport()->repaint();
       return;
     case Qt::Key_V: {
       const std::string clipboardText =
@@ -95,7 +135,8 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       m_editor->insert_char(pos_to_index_ffi(*m_editor, c),
                             clipboardText.c_str());
 
-      repaint();
+      performResize();
+      viewport()->repaint();
       return;
     }
     case Qt::Key_C: {
@@ -104,7 +145,8 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
         QApplication::clipboard()->setText(text.c_str());
       }
 
-      repaint();
+      performResize();
+      viewport()->repaint();
       return;
     }
     case Qt::Key_X: {
@@ -114,7 +156,8 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       }
       m_editor->delete_selection_and_clear();
 
-      repaint();
+      performResize();
+      viewport()->repaint();
       return;
     }
     }
@@ -183,7 +226,8 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   }
   }
 
-  repaint();
+  performResize();
+  viewport()->repaint();
 }
 
 CursorFFI EditorWidget::makeCursorFFI(std::size_t row, std::size_t column) {
