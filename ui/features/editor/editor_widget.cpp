@@ -51,13 +51,11 @@ void EditorWidget::performResize() {
 
 void EditorWidget::paintEvent(QPaintEvent *event) {
   QPainter painter(viewport());
+  painter.setClipRect(viewport()->rect());
+  painter.setClipping(true);
 
   // Background
   painter.fillRect(rect(), "black");
-
-  // Translate to account for scrollbars.
-  painter.translate(-horizontalScrollBar()->value(),
-                    -verticalScrollBar()->value());
 
   // TODO: Add theming
   // Text
@@ -70,10 +68,16 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   const auto lineHeight = fontMetrics.height();
 
   // TODO: Implement line wrapping option toggle
-  for (int i = 0; i < m_editor->num_rows(); i++) {
-    painter.drawText(
-        0, (i + 1) * fontMetrics.height() - (fontMetrics.height() / 4),
-        m_editor->line(i).c_str());
+  int startingLine = verticalScrollBar()->value() / lineHeight;
+  int endingLine =
+      (verticalScrollBar()->value() + viewport()->height()) / lineHeight;
+
+  for (int i = startingLine;
+       i < m_editor->num_rows() && i < endingLine + LINE_DRAWING_BUFFER; i++) {
+    painter.drawText(0,
+                     ((i + 1 - startingLine) * fontMetrics.height() -
+                      (fontMetrics.height() / 4)),
+                     m_editor->line(i).c_str());
   }
 
   // Selection

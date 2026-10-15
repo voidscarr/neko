@@ -28,4 +28,5 @@ private:
 
   const int CURSOR_WIDTH = 1.0;
   const double VIEWPORT_PADDING = 50.0;
+  const int LINE_DRAWING_BUFFER = 10.0;
 };
