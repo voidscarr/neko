@@ -170,6 +170,11 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       return;
     }
 
+    // Skip char entry if ESC is pressed.
+    if (event->key() == Qt::Key_Escape) {
+      return;
+    }
+
     const auto c =
         makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
     m_editor->insert_char(pos_to_index_ffi(*m_editor, c),

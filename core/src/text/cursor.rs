@@ -127,5 +127,6 @@ impl Cursor {
     pub fn move_to(&mut self, row: usize, column: usize) {
         self.row = row;
         self.column = column;
+        self.sticky_column = column;
     }
 }

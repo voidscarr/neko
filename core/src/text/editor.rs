@@ -141,6 +141,7 @@ impl Editor {
             self.cursor.row(),
             self.buffer.row_len(self.cursor.row().saturating_sub(1)),
         );
+        self.selection.clear_active();
     }
 
     pub fn move_right(&mut self, amount: usize) {
@@ -154,6 +155,7 @@ impl Editor {
             self.cursor.row(),
             adjusted_rows_len,
         );
+        self.selection.clear_active();
     }
 
     pub fn move_down(&mut self, amount: usize) {
@@ -174,6 +176,7 @@ impl Editor {
             self.buffer
                 .row_len(self.cursor.row().saturating_add(adjusted_target_row)),
         );
+        self.selection.clear_active();
     }
 
     pub fn move_up(&mut self, amount: usize) {
@@ -182,6 +185,7 @@ impl Editor {
             self.cursor.row(),
             self.buffer.row_len(self.cursor.row().saturating_sub(1)),
         );
+        self.selection.clear_active();
     }
 
     pub fn select_all(&mut self) {
