@@ -210,11 +210,7 @@ impl Editor {
     }
 
     pub fn line(&self, row: usize) -> String {
-        self.buffer
-            .rows()
-            .nth(row)
-            .expect("Unable to get line at specified row")
-            .to_string()
+        self.buffer.row(row)
     }
 
     pub fn line_len(&self, row: usize) -> usize {

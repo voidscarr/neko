@@ -36,6 +36,10 @@ impl Buffer {
         self.content.byte_slice(range_start..range_end).to_string()
     }
 
+    pub fn row(&self, row: usize) -> String {
+        self.content.line(row).to_string()
+    }
+
     pub fn rows(&self) -> RawLines {
         self.content.raw_lines()
     }
