@@ -142,12 +142,14 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
 }
 
 void EditorWidget::keyPressEvent(QKeyEvent *event) {
-  auto ctrlActive =
+  const auto ctrlActive =
       event->modifiers().testFlag(Qt::KeyboardModifier::ControlModifier);
-  auto cmdActive =
+  const auto cmdActive =
       event->modifiers().testFlag(Qt::KeyboardModifier::MetaModifier);
-  auto altActive =
+  const auto altActive =
       event->modifiers().testFlag(Qt::KeyboardModifier::AltModifier);
+  const auto shiftActive =
+      event->modifiers().testFlag(Qt::KeyboardModifier::ShiftModifier);
 
   bool selectionActive = m_editor->selection_active();
 
@@ -207,15 +209,13 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   switch (event->key()) {
   case Qt::Key_Enter:
   case Qt::Key_Return: {
-    const auto c =
-        makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
+    const auto c = makeCursorFFI();
 
     m_editor->insert_char(pos_to_index_ffi(*m_editor, c), "\n");
     break;
   }
   case Qt::Key_Tab: {
-    const auto c =
-        makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
+    const auto c = makeCursorFFI();
 
     // TODO: Make this configurable for \t or 2/4/8+ spaces
     m_editor->insert_char(pos_to_index_ffi(*m_editor, c), "    ");
@@ -233,19 +233,19 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
 
   case Qt::Key_Left:
     // TODO: Deselect
-    m_editor->move_left(1);
+    m_editor->move_left(1, !shiftActive);
     break;
   case Qt::Key_Right:
     // TODO: Deselect
-    m_editor->move_right(1);
+    m_editor->move_right(1, !shiftActive);
     break;
   case Qt::Key_Down:
     // TODO: Deselect
-    m_editor->move_down(1);
+    m_editor->move_down(1, !shiftActive);
     break;
   case Qt::Key_Up:
     // TODO: Deselect
-    m_editor->move_up(1);
+    m_editor->move_up(1, !shiftActive);
     break;
 
   default: {
@@ -254,13 +254,12 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       return;
     }
 
-    // Skip char entry if ESC is pressed.
-    if (event->key() == Qt::Key_Escape) {
+    // Skip char entry if ESC or Shift is pressed.
+    if (event->key() == Qt::Key_Escape || event->key() == Qt::Key_Shift) {
       return;
     }
 
-    const auto c =
-        makeCursorFFI(m_editor->cursor_row(), m_editor->cursor_row());
+    const auto c = makeCursorFFI();
     m_editor->insert_char(pos_to_index_ffi(*m_editor, c),
                           event->text().toStdString().c_str());
     break;
@@ -272,7 +271,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   viewport()->repaint();
 }
 
-CursorFFI EditorWidget::makeCursorFFI(std::size_t row, std::size_t column) {
+CursorFFI EditorWidget::makeCursorFFI() {
   const auto c = CursorFFI{
       .row = m_editor->cursor_row(),
       .column = m_editor->cursor_col(),

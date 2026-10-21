@@ -17,7 +17,7 @@ private:
   void resizeEvent(QResizeEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
   void deleteSelectionIfActive(rust::Box<Editor> &editor);
-  CursorFFI makeCursorFFI(std::size_t row, std::size_t column);
+  CursorFFI makeCursorFFI();
 
   QSize calculateResize();
   void performResize();

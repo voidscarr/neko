@@ -34,10 +34,10 @@ mod ffi {
         fn line(self: &Editor, row: usize) -> String;
         fn line_len(self: &Editor, row: usize) -> usize;
         fn content_len(self: &Editor) -> usize;
-        fn move_left(&mut self, amount: usize);
-        fn move_right(&mut self, amount: usize);
-        fn move_down(&mut self, amount: usize);
-        fn move_up(&mut self, amount: usize);
+        fn move_left(&mut self, amount: usize, clear_selection: bool);
+        fn move_right(&mut self, amount: usize, clear_selection: bool);
+        fn move_down(&mut self, amount: usize, clear_selection: bool);
+        fn move_up(&mut self, amount: usize, clear_selection: bool);
 
         fn num_rows(self: &Editor) -> usize;
 

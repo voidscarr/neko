@@ -60,7 +60,9 @@ impl Editor {
             let start = self.pos_to_index(&self.selection.start());
             let end = self.pos_to_index(&self.selection.end());
 
-            self.remove_char(start, end);
+            // NOTE: Manually do the same as `remove_char` to avoid
+            // moving left 2-3x after selection deletion.
+            let _ = self.buffer.remove_char(start, end);
             self.selection.clear_active();
 
             // Adjust index to selection start.
@@ -117,7 +119,9 @@ impl Editor {
             let start = self.pos_to_index(&self.selection.start());
             let end = self.pos_to_index(&self.selection.end());
 
-            self.remove_char(start, end);
+            // NOTE: Manually do the same as `remove_char` to avoid
+            // moving left 2-3x times after selection deletion.
+            let _ = self.buffer.remove_char(start, end);
             self.selection.clear_active();
         }
     }
@@ -134,20 +138,37 @@ impl Editor {
         self.selection.active()
     }
 
-    pub fn move_left(&mut self, amount: usize) {
+    pub fn move_left(&mut self, amount: usize, clear_selection: bool) {
+        if clear_selection {
+            self.selection.clear_active();
+        } else {
+            self.selection.select_left(
+                self.cursor,
+                self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+            );
+            self.selection.set_active();
+        }
+
         self.cursor.move_left(
             amount,
             self.cursor.column(),
             self.cursor.row(),
             self.buffer.row_len(self.cursor.row().saturating_sub(1)),
         );
-        self.selection.clear_active();
     }
 
-    pub fn move_right(&mut self, amount: usize) {
+    pub fn move_right(&mut self, amount: usize, clear_selection: bool) {
         let last_line_has_newline = self.buffer.last_line_has_newline();
         let adjusted_rows_len =
             self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
+
+        if clear_selection {
+            self.selection.clear_active();
+        } else {
+            self.selection
+                .select_right(self.cursor, self.buffer.len(), adjusted_rows_len);
+            self.selection.set_active();
+        }
 
         self.cursor.move_right(
             amount,
@@ -155,10 +176,9 @@ impl Editor {
             self.cursor.row(),
             adjusted_rows_len,
         );
-        self.selection.clear_active();
     }
 
-    pub fn move_down(&mut self, amount: usize) {
+    pub fn move_down(&mut self, amount: usize, clear_selection: bool) {
         let last_line_has_newline = self.buffer.last_line_has_newline();
         let adjusted_rows_len =
             self.buffer.rows().len() - if last_line_has_newline { 0 } else { 1 };
@@ -168,6 +188,19 @@ impl Editor {
             1
         };
 
+        if clear_selection {
+            self.selection.clear_active();
+        } else {
+            self.selection.select_down(
+                self.cursor,
+                adjusted_rows_len,
+                self.buffer.row_len(self.cursor.row()),
+                self.buffer
+                    .row_len(self.cursor.row().saturating_add(adjusted_target_row)),
+            );
+            self.selection.set_active();
+        }
+
         self.cursor.move_down(
             amount,
             self.cursor.row(),
@@ -176,16 +209,30 @@ impl Editor {
             self.buffer
                 .row_len(self.cursor.row().saturating_add(adjusted_target_row)),
         );
-        self.selection.clear_active();
+
+        if clear_selection {
+            self.selection.clear_active();
+        } else {
+            // self.selection.select();
+        }
     }
 
-    pub fn move_up(&mut self, amount: usize) {
+    pub fn move_up(&mut self, amount: usize, clear_selection: bool) {
+        if clear_selection {
+            self.selection.clear_active();
+        } else {
+            self.selection.select_up(
+                self.cursor,
+                self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+            );
+            self.selection.set_active();
+        }
+
         self.cursor.move_up(
             amount,
             self.cursor.row(),
             self.buffer.row_len(self.cursor.row().saturating_sub(1)),
         );
-        self.selection.clear_active();
     }
 
     pub fn select_all(&mut self) {
