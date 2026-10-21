@@ -49,6 +49,33 @@ void EditorWidget::performResize() {
   updateGeometry();
 }
 
+void EditorWidget::scrollToCursor() {
+  const auto cursorCol = m_editor->cursor_col();
+  const auto cursorRow = m_editor->cursor_row();
+
+  const auto charWidth = m_fontMetrics.averageCharWidth();
+  const auto lineHeight = m_fontMetrics.height();
+
+  const auto cursorX = cursorCol * charWidth;
+  const auto cursorY = cursorRow * lineHeight;
+
+  if (cursorX >
+      horizontalScrollBar()->value() + viewport()->width() - VIEWPORT_PADDING) {
+    horizontalScrollBar()->setValue(cursorX + VIEWPORT_PADDING -
+                                    viewport()->width());
+  } else if (cursorX < horizontalScrollBar()->value() + VIEWPORT_PADDING) {
+    horizontalScrollBar()->setValue(cursorX - VIEWPORT_PADDING);
+  }
+
+  if (cursorY >
+      verticalScrollBar()->value() + viewport()->height() - VIEWPORT_PADDING) {
+    verticalScrollBar()->setValue(cursorY + VIEWPORT_PADDING -
+                                  viewport()->height());
+  } else if (cursorY < verticalScrollBar()->value() + VIEWPORT_PADDING) {
+    verticalScrollBar()->setValue(cursorY - VIEWPORT_PADDING);
+  }
+}
+
 void EditorWidget::paintEvent(QPaintEvent *event) {
   QPainter painter(viewport());
   painter.setClipRect(viewport()->rect());
@@ -74,10 +101,11 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
 
   for (int i = startingLine;
        i < m_editor->num_rows() && i < endingLine + LINE_DRAWING_BUFFER; i++) {
-    painter.drawText(-horizontalScrollBar()->value(),
-                     ((i + 1 - startingLine) * fontMetrics.height() -
-                      (fontMetrics.height() / 4)),
-                     m_editor->line(i).c_str());
+    const auto x = -horizontalScrollBar()->value();
+    const auto y = ((i + 1 - startingLine) * fontMetrics.height() -
+                    (fontMetrics.height() / 4));
+
+    painter.drawText(x, y, m_editor->line(i).c_str());
   }
 
   // Selection
@@ -89,15 +117,16 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
     painter.setBrush(QColor("#40a162a1"));
 
     for (int i = startingLine;
-         (i < endingLine + LINE_DRAWING_BUFFER) &&
-         (i < startingLine + (selEnd.row - selStart.row + 1)) &&
+         i < endingLine + LINE_DRAWING_BUFFER &&
+         i < startingLine + (selEnd.row - selStart.row + 1) &&
          i < m_editor->num_rows();
          i++) {
       const auto lineLength = m_editor->line_len(i);
+      const auto x = -horizontalScrollBar()->value();
+      const auto y = (lineHeight * (i - startingLine));
 
-      painter.drawRect(QRectF(QPointF(-horizontalScrollBar()->value(),
-                                      (lineHeight * (i - startingLine))),
-                              QSizeF(charWidth * lineLength, lineHeight)));
+      painter.drawRect(
+          QRectF(QPointF(x, y), QSizeF(charWidth * lineLength, lineHeight)));
     }
   }
 
@@ -146,6 +175,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
                             clipboardText.c_str());
 
       performResize();
+      scrollToCursor();
       viewport()->repaint();
       return;
     }
@@ -167,6 +197,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       m_editor->delete_selection_and_clear();
 
       performResize();
+      scrollToCursor();
       viewport()->repaint();
       return;
     }
@@ -237,6 +268,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   }
 
   performResize();
+  scrollToCursor();
   viewport()->repaint();
 }
 

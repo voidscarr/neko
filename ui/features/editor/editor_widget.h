@@ -21,6 +21,7 @@ private:
 
   QSize calculateResize();
   void performResize();
+  void scrollToCursor();
 
   QFont m_font;
   QFontMetricsF m_fontMetrics;
