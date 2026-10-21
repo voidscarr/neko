@@ -90,19 +90,21 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
 
     for (int i = startingLine;
          (i < endingLine + LINE_DRAWING_BUFFER) &&
-         (i < startingLine + (selEnd.row - selStart.row)) &&
+         (i < startingLine + (selEnd.row - selStart.row + 1)) &&
          i < m_editor->num_rows();
          i++) {
       const auto lineLength = m_editor->line_len(i);
 
-      painter.drawRect(QRectF(QPointF(0, (lineHeight * (i - startingLine))),
+      painter.drawRect(QRectF(QPointF(-horizontalScrollBar()->value(),
+                                      (lineHeight * (i - startingLine))),
                               QSizeF(charWidth * lineLength, lineHeight)));
     }
   }
 
   // Cursor
-  const auto cursorX = m_editor->cursor_col() * charWidth;
-  const auto cursorY = m_editor->cursor_row() * lineHeight;
+  const auto cursorX =
+      (m_editor->cursor_col() * charWidth) - horizontalScrollBar()->value();
+  const auto cursorY = (m_editor->cursor_row() - startingLine) * lineHeight;
 
   painter.setPen("#a162a1");
   painter.setBrush(QColor("#a162a1"));
