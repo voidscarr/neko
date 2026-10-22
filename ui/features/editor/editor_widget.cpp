@@ -113,7 +113,7 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
     const auto selStart = selection_start_ffi(m_editor);
     const auto selEnd = selection_end_ffi(m_editor);
 
-    painter.setPen("#40a162a1");
+    painter.setPen(Qt::NoPen);
     painter.setBrush(QColor("#40a162a1"));
 
     for (int i = startingLine;
