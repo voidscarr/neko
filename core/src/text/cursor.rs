@@ -81,8 +81,6 @@ impl Cursor {
         if curr_col == 0 && curr_row == 0 {
             return;
         } else if amount > curr_col {
-            println!("{amount}");
-            println!("curr: {curr_col}");
             self.row = self.row.saturating_sub(amount);
             self.column = prev_row_len;
             self.sticky_column = self.column;
