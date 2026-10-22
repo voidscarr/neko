@@ -22,12 +22,15 @@ private:
   QSize calculateResize();
   void performResize();
   void scrollToCursor();
+  void increaseFontSize();
+  void decreaseFontSize();
 
   QFont m_font;
   QFontMetricsF m_fontMetrics;
   rust::Box<Editor> m_editor;
 
   const int CURSOR_WIDTH = 1.0;
-  const double VIEWPORT_PADDING = 100.0;
+  double VIEWPORT_PADDING = 100.0;
   const int LINE_DRAWING_BUFFER = 10.0;
+  const int FONT_SIZE_INCREMENT = 2.0;
 };

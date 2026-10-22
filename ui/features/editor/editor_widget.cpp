@@ -203,6 +203,12 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
       viewport()->repaint();
       return;
     }
+    case Qt::Key_Equal:
+      increaseFontSize();
+      return;
+    case Qt::Key_Minus:
+      decreaseFontSize();
+      return;
     }
   }
 
@@ -269,6 +275,29 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
   performResize();
   scrollToCursor();
   viewport()->repaint();
+}
+
+void EditorWidget::increaseFontSize() {
+  m_font.setPointSizeF(m_font.pointSizeF() + FONT_SIZE_INCREMENT);
+  m_fontMetrics = QFontMetricsF(m_font);
+  VIEWPORT_PADDING = qMax(100.0, m_font.pointSizeF() * 3);
+
+  viewport()->repaint();
+  viewport()->updateGeometry();
+}
+
+void EditorWidget::decreaseFontSize() {
+  if (m_font.pointSizeF() < 8) {
+    m_font.setPointSizeF(8.0);
+  } else {
+    m_font.setPointSizeF(m_font.pointSizeF() - FONT_SIZE_INCREMENT);
+  }
+
+  VIEWPORT_PADDING = qMax(100.0, m_font.pointSizeF() * 3);
+  m_fontMetrics = QFontMetricsF(m_font);
+
+  viewport()->repaint();
+  viewport()->updateGeometry();
 }
 
 CursorFFI EditorWidget::makeCursorFFI() {
