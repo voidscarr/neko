@@ -100,6 +100,10 @@ impl Editor {
     }
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
+        if range_end == 0 {
+            return;
+        };
+
         self.cursor.move_left(
             range_end - range_start,
             self.cursor.column(),
