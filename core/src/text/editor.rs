@@ -1,4 +1,4 @@
-use super::{Buffer, Cursor, Selection};
+use super::{Buffer, Cursor, Selection, selection::Direction};
 
 /// A single editor instance. Holds relevant document information like the cursor, selection,
 /// buffer, etc.
@@ -60,9 +60,7 @@ impl Editor {
             let start = self.pos_to_index(&self.selection.start());
             let end = self.pos_to_index(&self.selection.end());
 
-            // NOTE: Manually do the same as `remove_char` to avoid
-            // moving left 2-3x after selection deletion.
-            let _ = self.buffer.remove_char(start, end);
+            self.remove_char(start, end);
             self.selection.clear_active();
 
             // Adjust index to selection start.
@@ -102,16 +100,14 @@ impl Editor {
     }
 
     pub fn remove_char(&mut self, range_start: usize, range_end: usize) {
-        let deleted_str = self.buffer.remove_char(range_start, range_end);
+        self.cursor.move_left(
+            range_end - range_start,
+            self.cursor.column(),
+            self.cursor.row(),
+            self.buffer.row_len(self.cursor.row().saturating_sub(1)),
+        );
 
-        for _ in deleted_str.chars() {
-            self.cursor.move_left(
-                range_end - range_start,
-                self.cursor.column(),
-                self.cursor.row(),
-                self.buffer.row_len(self.cursor.row().saturating_sub(1)),
-            );
-        }
+        let _ = self.buffer.remove_char(range_start, range_end);
     }
 
     pub fn delete_selection_and_clear(&mut self) {
@@ -119,9 +115,7 @@ impl Editor {
             let start = self.pos_to_index(&self.selection.start());
             let end = self.pos_to_index(&self.selection.end());
 
-            // NOTE: Manually do the same as `remove_char` to avoid
-            // moving left 2-3x times after selection deletion.
-            let _ = self.buffer.remove_char(start, end);
+            self.remove_char(start, end);
             self.selection.clear_active();
         }
     }
@@ -147,6 +141,7 @@ impl Editor {
                 self.buffer.row_len(self.cursor.row().saturating_sub(1)),
             );
             self.selection.set_active();
+            self.selection.set_direction(Direction::Left);
         }
 
         self.cursor.move_left(
@@ -168,6 +163,7 @@ impl Editor {
             self.selection
                 .select_right(self.cursor, self.buffer.len(), adjusted_rows_len);
             self.selection.set_active();
+            self.selection.set_direction(Direction::Right);
         }
 
         self.cursor.move_right(
@@ -199,6 +195,7 @@ impl Editor {
                     .row_len(self.cursor.row().saturating_add(adjusted_target_row)),
             );
             self.selection.set_active();
+            self.selection.set_direction(Direction::Down);
         }
 
         self.cursor.move_down(
@@ -226,6 +223,7 @@ impl Editor {
                 self.buffer.row_len(self.cursor.row().saturating_sub(1)),
             );
             self.selection.set_active();
+            self.selection.set_direction(Direction::Up);
         }
 
         self.cursor.move_up(
