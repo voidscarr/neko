@@ -28,6 +28,7 @@ private:
   QFont m_font;
   QFontMetricsF m_fontMetrics;
   rust::Box<Editor> m_editor;
+  rust::Box<Config> m_config;
 
   const int CURSOR_WIDTH = 1.0;
   double VIEWPORT_PADDING = 100.0;

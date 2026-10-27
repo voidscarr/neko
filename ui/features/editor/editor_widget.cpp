@@ -8,7 +8,10 @@
 EditorWidget::EditorWidget(QWidget *parent)
     : m_font(QFont("IBM Plex Mono", 15.0)),
       m_fontMetrics(QFontMetricsF(m_font)), m_editor(new_editor()),
-      QAbstractScrollArea(parent) {
+      m_config(new_config()), QAbstractScrollArea(parent) {
+  m_config->load_config();
+  m_font.setPointSizeF(m_config->font_size());
+
   setAutoFillBackground(false);
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
   focusWidget();
@@ -238,19 +241,15 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
     break;
 
   case Qt::Key_Left:
-    // TODO: Deselect
     m_editor->move_left(1, !shiftActive);
     break;
   case Qt::Key_Right:
-    // TODO: Deselect
     m_editor->move_right(1, !shiftActive);
     break;
   case Qt::Key_Down:
-    // TODO: Deselect
     m_editor->move_down(1, !shiftActive);
     break;
   case Qt::Key_Up:
-    // TODO: Deselect
     m_editor->move_up(1, !shiftActive);
     break;
 
@@ -278,6 +277,7 @@ void EditorWidget::keyPressEvent(QKeyEvent *event) {
 }
 
 void EditorWidget::increaseFontSize() {
+  m_config->set_font_size(m_font.pointSizeF() + FONT_SIZE_INCREMENT);
   m_font.setPointSizeF(m_font.pointSizeF() + FONT_SIZE_INCREMENT);
   m_fontMetrics = QFontMetricsF(m_font);
   VIEWPORT_PADDING = qMax(100.0, m_font.pointSizeF() * 3);
@@ -287,6 +287,8 @@ void EditorWidget::increaseFontSize() {
 }
 
 void EditorWidget::decreaseFontSize() {
+  m_config->set_font_size(m_font.pointSizeF() + FONT_SIZE_INCREMENT);
+
   if (m_font.pointSizeF() < 8) {
     m_font.setPointSizeF(8.0);
   } else {

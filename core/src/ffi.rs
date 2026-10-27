@@ -1,8 +1,12 @@
-use crate::{Cursor, Editor};
+use crate::{Cursor, Editor, core::Config};
 use ffi::CursorFFI;
 
 fn new_editor() -> Box<Editor> {
     Box::new(Editor::new())
+}
+
+fn new_config() -> Box<Config> {
+    Box::new(Config::new())
 }
 
 #[cxx::bridge]
@@ -16,8 +20,10 @@ mod ffi {
 
     extern "Rust" {
         type Editor;
+        type Config;
 
         fn new_editor() -> Box<Editor>;
+        fn new_config() -> Box<Config>;
 
         // Editor
         fn insert_char(self: &mut Editor, index: usize, text: &str);
@@ -31,17 +37,20 @@ mod ffi {
         fn delete_selection_and_clear(self: &mut Editor);
         fn content_slice(self: &Editor, range_start: usize, range_end: usize) -> String;
         fn selected_text(self: &Editor) -> String;
+        fn select_all(self: &mut Editor);
         fn line(self: &Editor, row: usize) -> String;
         fn line_len(self: &Editor, row: usize) -> usize;
         fn content_len(self: &Editor) -> usize;
-        fn move_left(&mut self, amount: usize, clear_selection: bool);
-        fn move_right(&mut self, amount: usize, clear_selection: bool);
-        fn move_down(&mut self, amount: usize, clear_selection: bool);
-        fn move_up(&mut self, amount: usize, clear_selection: bool);
-
+        fn move_left(self: &mut Editor, amount: usize, clear_selection: bool);
+        fn move_right(self: &mut Editor, amount: usize, clear_selection: bool);
+        fn move_down(self: &mut Editor, amount: usize, clear_selection: bool);
+        fn move_up(self: &mut Editor, amount: usize, clear_selection: bool);
         fn num_rows(self: &Editor) -> usize;
 
-        fn select_all(&mut self);
+        // Config
+        fn font_size(self: &Config) -> usize;
+        fn set_font_size(self: &mut Config, font_size: usize);
+        fn load_config(self: &mut Config);
     }
 }
 
