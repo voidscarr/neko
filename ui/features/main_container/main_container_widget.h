@@ -14,6 +14,7 @@ public:
   ~MainContainerWidget() = default;
 
 private:
+  rust::Box<TabManager> m_tabManager;
   rust::Box<Config> m_config;
   rust::Box<ThemeManager> m_themeManager;
   rust::Box<Editor> m_editor;

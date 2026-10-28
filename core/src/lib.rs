@@ -1,5 +1,6 @@
 mod config;
 mod ffi;
+mod tabs;
 mod text;
 mod theme;
 

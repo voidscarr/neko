@@ -1,5 +1,5 @@
-use crate::{Cursor, Editor, ThemeManager, core::Config};
-use ffi::{CursorFFI, ThemeFFI};
+use crate::{Cursor, Editor, ThemeManager, core::Config, tabs::TabManager};
+use ffi::{CursorFFI, TabFFI, ThemeFFI};
 
 fn new_editor() -> Box<Editor> {
     Box::new(Editor::new())
@@ -11,6 +11,10 @@ fn new_config() -> Box<Config> {
 
 fn new_theme_manager() -> Box<ThemeManager> {
     Box::new(ThemeManager::new())
+}
+
+fn new_tab_manager() -> Box<TabManager> {
+    Box::new(TabManager::new())
 }
 
 #[cxx::bridge]
@@ -30,14 +34,23 @@ mod ffi {
         cursor: String,
     }
 
+    struct TabFFI {
+        active: bool,
+        dirty: bool,
+        title: String,
+        path: String,
+    }
+
     extern "Rust" {
         type Editor;
         type Config;
         type ThemeManager;
+        type TabManager;
 
         fn new_editor() -> Box<Editor>;
         fn new_config() -> Box<Config>;
         fn new_theme_manager() -> Box<ThemeManager>;
+        fn new_tab_manager() -> Box<TabManager>;
 
         // Editor
         fn insert_char(self: &mut Editor, index: usize, text: &str);
@@ -70,6 +83,10 @@ mod ffi {
         // ThemeManager
         fn themes_ffi(theme_manager: &ThemeManager) -> Vec<ThemeFFI>;
         fn theme_by_name_ffi(theme_manager: &ThemeManager, name: String) -> ThemeFFI;
+
+        // TabManager
+        fn tabs_ffi(tab_manager: &TabManager) -> Vec<TabFFI>;
+        fn tab_by_path_ffi(tab_manager: &TabManager, path: String) -> TabFFI;
     }
 }
 
@@ -127,5 +144,33 @@ fn theme_by_name_ffi(theme_manager: &ThemeManager, name: String) -> ThemeFFI {
         foreground: theme.foreground,
         selection: theme.selection,
         cursor: theme.cursor,
+    }
+}
+
+fn tabs_ffi(tab_manager: &TabManager) -> Vec<TabFFI> {
+    let mut tabs: Vec<TabFFI> = vec![];
+
+    for tab in tab_manager.tabs() {
+        let tab_ffi = TabFFI {
+            active: tab.active,
+            dirty: tab.dirty,
+            title: tab.title,
+            path: tab.path.to_string_lossy().to_string(),
+        };
+
+        tabs.push(tab_ffi);
+    }
+
+    tabs
+}
+
+fn tab_by_path_ffi(tab_manager: &TabManager, path: String) -> TabFFI {
+    let tab = tab_manager.tab_by_path(path.clone());
+
+    TabFFI {
+        active: tab.active,
+        dirty: tab.dirty,
+        title: tab.title,
+        path,
     }
 }
