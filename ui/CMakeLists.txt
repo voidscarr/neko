@@ -22,6 +22,14 @@ qt_add_executable(neko
 
     features/editor/editor_widget.cpp
     features/editor/editor_widget.h
+    
+    features/tabs/tab_container_widget.cpp
+    features/tabs/tab_container_widget.h
+    features/tabs/tab_widget.cpp
+    features/tabs/tab_widget.cpp
+
+    features/main_container/main_container_widget.cpp
+    features/main_container/main_container_widget.h
 )
 
 qt_add_translations(

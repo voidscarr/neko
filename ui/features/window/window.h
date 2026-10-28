@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../editor/editor_widget.h"
+#include "../main_container/main_container_widget.h"
 #include <QMainWindow>
 
 class MainWindow : public QMainWindow {
@@ -12,4 +13,5 @@ public:
 
 private:
   EditorWidget *m_editorWidget;
+  MainContainerWidget *m_mainContainerWidget;
 };

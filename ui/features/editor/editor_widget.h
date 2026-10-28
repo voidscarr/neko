@@ -8,7 +8,9 @@ class EditorWidget : public QAbstractScrollArea {
   Q_OBJECT
 
 public:
-  EditorWidget(QWidget *parent = nullptr);
+  EditorWidget(rust::Box<Editor> &editor, rust::Box<Config> &config,
+               rust::Box<ThemeManager> &themeManager,
+               QWidget *parent = nullptr);
   ~EditorWidget() = default;
 
 private:
@@ -27,9 +29,9 @@ private:
 
   QFont m_font;
   QFontMetricsF m_fontMetrics;
-  rust::Box<Editor> m_editor;
-  rust::Box<Config> m_config;
-  rust::Box<ThemeManager> m_themeManager;
+  rust::Box<Editor> &m_editor;
+  rust::Box<Config> &m_config;
+  rust::Box<ThemeManager> &m_themeManager;
 
   const int CURSOR_WIDTH = 1.0;
   double VIEWPORT_PADDING = 100.0;

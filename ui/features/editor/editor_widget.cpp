@@ -5,13 +5,17 @@
 #include <QPainter>
 #include <ffi.rs.h>
 
-EditorWidget::EditorWidget(QWidget *parent)
+EditorWidget::EditorWidget(rust::Box<Editor> &editor, rust::Box<Config> &config,
+                           rust::Box<ThemeManager> &themeManager,
+                           QWidget *parent)
     : m_font(QFont("IBM Plex Mono", 15.0)),
-      m_fontMetrics(QFontMetricsF(m_font)), m_editor(new_editor()),
-      m_config(new_config()), m_themeManager(new_theme_manager()),
-      QAbstractScrollArea(parent) {
+      m_fontMetrics(QFontMetricsF(m_font)), m_editor(editor), m_config(config),
+      m_themeManager(themeManager), QAbstractScrollArea(parent) {
   m_config->load_config();
   m_font.setPointSizeF(m_config->font_size());
+
+  setContentsMargins(0, 0, 0, 0);
+  setFrameShape(QFrame::NoFrame);
 
   setAutoFillBackground(false);
   setFocusPolicy(Qt::FocusPolicy::StrongFocus);
