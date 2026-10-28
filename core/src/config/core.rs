@@ -1,8 +1,4 @@
-use std::{
-    fs::File,
-    io::{Read, Write},
-    path::PathBuf,
-};
+use std::{fs::File, io::Write, path::PathBuf};
 
 use serde::{Deserialize, Serialize};
 
@@ -11,6 +7,7 @@ pub struct Config {
     path: PathBuf,
     default_path: PathBuf,
     font_size: usize,
+    theme_name: String,
 }
 
 impl Default for Config {
@@ -19,6 +16,7 @@ impl Default for Config {
             path: Self::determine_path(),
             default_path: Self::determine_path(),
             font_size: 16,
+            theme_name: "Dark".to_string(),
         }
     }
 }
@@ -30,6 +28,7 @@ impl Config {
                 std::env::var("HOME").expect("No HOME directory.") + "/.config/neko/settings.json",
             )
         } else {
+            // TODO: Test this
             PathBuf::from(
                 std::env::var("APP_DATA").expect("No APP_DATA directory.")
                     + "Roaming/neko/settings.json",
@@ -57,8 +56,10 @@ impl Config {
         Config::default()
     }
 
-    pub fn create_file(&self) {
+    pub fn create_file(&mut self) {
+        // TODO: Support merging of current config + new values
         let _ = File::create(self.path.clone());
+        self.save_to_disk();
     }
 
     pub fn save_to_disk(&mut self) {
@@ -75,5 +76,9 @@ impl Config {
     pub fn set_font_size(&mut self, font_size: usize) {
         self.font_size = font_size;
         self.save_to_disk();
+    }
+
+    pub fn theme_name(&self) -> String {
+        self.theme_name.clone()
     }
 }

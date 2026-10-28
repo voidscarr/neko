@@ -1,5 +1,5 @@
-use crate::{Cursor, Editor, core::Config};
-use ffi::CursorFFI;
+use crate::{Cursor, Editor, ThemeManager, core::Config};
+use ffi::{CursorFFI, ThemeFFI};
 
 fn new_editor() -> Box<Editor> {
     Box::new(Editor::new())
@@ -7,6 +7,10 @@ fn new_editor() -> Box<Editor> {
 
 fn new_config() -> Box<Config> {
     Box::new(Config::new())
+}
+
+fn new_theme_manager() -> Box<ThemeManager> {
+    Box::new(ThemeManager::new())
 }
 
 #[cxx::bridge]
@@ -18,12 +22,22 @@ mod ffi {
         sticky_column: usize,
     }
 
+    struct ThemeFFI {
+        name: String,
+        background: String,
+        foreground: String,
+        selection: String,
+        cursor: String,
+    }
+
     extern "Rust" {
         type Editor;
         type Config;
+        type ThemeManager;
 
         fn new_editor() -> Box<Editor>;
         fn new_config() -> Box<Config>;
+        fn new_theme_manager() -> Box<ThemeManager>;
 
         // Editor
         fn insert_char(self: &mut Editor, index: usize, text: &str);
@@ -51,6 +65,11 @@ mod ffi {
         fn font_size(self: &Config) -> usize;
         fn set_font_size(self: &mut Config, font_size: usize);
         fn load_config(self: &mut Config);
+        fn theme_name(self: &Config) -> String;
+
+        // ThemeManager
+        fn themes_ffi(theme_manager: &ThemeManager) -> Vec<ThemeFFI>;
+        fn theme_by_name_ffi(theme_manager: &ThemeManager, name: String) -> ThemeFFI;
     }
 }
 
@@ -79,4 +98,34 @@ fn pos_to_index_ffi(editor: &Editor, cursor: &CursorFFI) -> usize {
 
     c.move_to(cursor.row, cursor.column);
     editor.pos_to_index(&c)
+}
+
+fn themes_ffi(theme_manager: &ThemeManager) -> Vec<ThemeFFI> {
+    let mut themes_list: Vec<ThemeFFI> = vec![];
+
+    for theme in theme_manager.themes() {
+        let theme_ffi = ThemeFFI {
+            name: theme.name.clone(),
+            background: theme.background.clone(),
+            foreground: theme.foreground.clone(),
+            selection: theme.selection.clone(),
+            cursor: theme.cursor.clone(),
+        };
+
+        themes_list.push(theme_ffi);
+    }
+
+    themes_list
+}
+
+fn theme_by_name_ffi(theme_manager: &ThemeManager, name: String) -> ThemeFFI {
+    let theme = theme_manager.theme_by_name(name);
+
+    ThemeFFI {
+        name: theme.name,
+        background: theme.background,
+        foreground: theme.foreground,
+        selection: theme.selection,
+        cursor: theme.cursor,
+    }
 }

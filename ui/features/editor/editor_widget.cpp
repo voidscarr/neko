@@ -8,7 +8,8 @@
 EditorWidget::EditorWidget(QWidget *parent)
     : m_font(QFont("IBM Plex Mono", 15.0)),
       m_fontMetrics(QFontMetricsF(m_font)), m_editor(new_editor()),
-      m_config(new_config()), QAbstractScrollArea(parent) {
+      m_config(new_config()), m_themeManager(new_theme_manager()),
+      QAbstractScrollArea(parent) {
   m_config->load_config();
   m_font.setPointSizeF(m_config->font_size());
 
@@ -84,13 +85,15 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
   painter.setClipRect(viewport()->rect());
   painter.setClipping(true);
 
-  // Background
-  painter.fillRect(rect(), "black");
+  const auto current_theme_name = m_config->theme_name();
+  auto theme = theme_by_name_ffi(*m_themeManager, current_theme_name);
 
-  // TODO: Add theming
+  // Background
+  painter.fillRect(rect(), theme.background.c_str());
+
   // Text
-  painter.setPen("#ffffff");
-  painter.setBrush("#ffffff");
+  painter.setPen(theme.foreground.c_str());
+  painter.setBrush(theme.foreground.c_str());
   painter.setFont(m_font);
 
   const auto fontMetrics = QFontMetricsF(m_font);
@@ -117,7 +120,7 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
     const auto selEnd = selection_end_ffi(m_editor);
 
     painter.setPen(Qt::NoPen);
-    painter.setBrush(QColor("#40a162a1"));
+    painter.setBrush(QColor(theme.selection.c_str()));
 
     for (int i = startingLine;
          i < endingLine + LINE_DRAWING_BUFFER &&
@@ -138,8 +141,8 @@ void EditorWidget::paintEvent(QPaintEvent *event) {
       (m_editor->cursor_col() * charWidth) - horizontalScrollBar()->value();
   const auto cursorY = (m_editor->cursor_row() - startingLine) * lineHeight;
 
-  painter.setPen("#a162a1");
-  painter.setBrush(QColor("#a162a1"));
+  painter.setPen(theme.cursor.c_str());
+  painter.setBrush(QColor(theme.cursor.c_str()));
   painter.drawRect(
       QRectF(QPointF(cursorX, cursorY), QSizeF(CURSOR_WIDTH, lineHeight)));
 }
